@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "maxwell2d-pyaedt-toolkit"
+version = "1.0.0"
+description = "Reusable Maxwell 2D and Maxwell Circuit helpers for straight electromagnetic accelerator modeling"
+requires-python = ">=3.10"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["maxwell2d_toolkit*", "maxwell_circuit_toolkit*"]
+
+[tool.pytest.ini_options]
+addopts = "-p no:cacheprovider"

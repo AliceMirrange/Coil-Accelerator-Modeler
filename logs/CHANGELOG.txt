@@ -1,0 +1,614 @@
+v1.0.0
+======
+Release
+-------
+- First public release of Coil Accelerator Modeler.
+- Package metadata, application title, documentation, and version checks now report 1.0.0.
+
+v0.19.3
+=======
+Changes
+-------
+- 将项目全局变量 `$proj_initZ` 加入 Optimetrics，固定优化范围为 `0mm...12mm`；缺失时自动创建为 `0mm`，已有合法值保持不变并用作 StartingPoint。
+- 同步设置项目变量的 Optimization Min/Max 与 `AcceleratorScreeningOptimization` 内部范围，避免变量表和 Optimization Setup 显示不同的边界。
+- 主窗口及独立建模窗口标题统一为 `Coil Accelerator Modeler 0.19.3`。
+- 新增 `$proj_initZ` 默认值、已有值保留、范围写入、标题版本同步和 changelog 版本同步回归检查；76 项测试及 AEDT 2024 R2 验证通过。
+
+v0.19.2
+=======
+Fixes
+-----
+- 修复 Optimetrics 将 SI 浮点数直接写成无单位属性，导致 `$gap` 等长度变量报错 `Attributes unit type cannot be different from the variable's definition` 的问题。
+- Min、Max、MinStep、MaxStep、MinFocus、MaxFocus、Level 和 StartingPoint 现在均换算并写成变量自身的 AEDT 单位，例如 `$gap=2.5mm...7.5mm`、`$C_n=100uF...1200uF`。
+- AEDT 验证工具现在实际创建并保存完整 Optimetrics Setup，不再只验证变量和模型/电路生成；73 项测试及 AEDT 2024 R2 实机验证通过。
+
+v0.19.1
+=======
+Changes
+-------
+- 调整 v0.19.0 的变量单位策略：AEDT 官方支持的单位原样保留；只有不受支持但可以换算的输入才输出为无单位 SI 数值。
+- 几何、位置、电容、电压和电阻变量分别保留 `mm`、`uF`、`V`、`mOhm`/`ohm`；材料表达式使用 AEDT 支持的 `Ohmm` 与 `kg_per_m3`。
+- `$capacitor_energy_density`、`$coil_weight_n`、`$capacitor_weight_n` 和 `$device_weight` 保持为有限实数 SI 数值，不再擅自附加或乘以 `1F`、`1kg` 等单位常量。
+- 变量验证改为检查单位是否在 AEDT 支持表内，并通过 `si_value` 确认结果为有限实数；复数即使虚部为零也会被拒绝。
+- 新增 AEDT 2024 R2 支持单位、材料表达式和 Circuit 直接变量引用验证；72 项测试通过。
+
+v0.19.0
+=======
+Changes
+-------
+- All accelerator-generated project variables now store unitless SI real values.
+- Geometry, winding, and Circuit component properties attach physical units only where variables are consumed.
+- AEDT post-write validation rejects nonempty variable units, non-finite values, and every complex numeric type, including zero imaginary parts.
+- Optimetrics bounds and starting points now use unitless SI literals.
+- Added an AEDT 2024.2 validation harness and expanded the regression suite to 70 tests.
+
+v0.18.3
+=======
+Fixes
+-----
+- Added the missing `is_copper` entry to the GUI prefix collector so `VariablePrefixes` is complete at runtime.
+- Added a regression assertion for the real GUI configuration path.
+
+v0.18.2
+=======
+Changes
+-------
+- Replaced each optimized resistivity with a binary `$is_copper_n` material selector: 0 is aluminum and 1 is copper.
+- Made `$rho_n` and `$material_density_n` dependent `if(...)` expressions driven by the same selector.
+- Converted capacitor energy density from J/g input to the AEDT-safe `J/1kg` expression before creating Optimetrics.
+- Updated tests and documentation; 66 tests pass.
+
+v0.18.1
+=======
+修改
+----
+- “校验参数”功能合并到“刷新参数表”，删除独立校验按钮。
+- Circuit 页红色动子位移提醒改为可点击；点击后复制不带括号的 `0,0,$proj_initZ`。
+- 版本由 0.18.0 升级为 0.18.1。
+
+v0.18.0
+=======
+新增/修改
+---------
+- Maxwell2D 建模页新增“材料及重量优化”选项和可编辑电容储能密度，默认 0.85J/g。
+- 启用后，每级 $rho_n 作为只含铜、铝电阻率两个 Levels 的离散优化变量。
+- 使用 AEDT if(...) 让材料密度与电阻率联动；新增线圈重量、电容重量和总装置重量项目变量。
+- Optimetrics 保留 Maximize Moving1.Speed，并新增 Minimize $device_weight 目标。
+- 版本由 0.17.1 升级为 0.18.0。
+
+v0.17.1
+=======
+修改
+----
+- GUI 的 Tk/ttk 命名字体统一改为 Microsoft YaHei UI，并保留各字体原有字号与粗细。
+- 版本由 0.17.0 升级为 0.17.1。
+
+v0.17.0
+=======
+新增/修改
+---------
+- 生成 External Circuit 时新增且保留项目全局变量 `$proj_initZ`；所有 VPULSE 的第二级起将 Td 改为 `$POSon_n-$proj_initZ`，第一级保持原公式。
+- GUI 页面和生成完成对话框新增动子位移提醒：沿 Z+ 执行 Move，Moving Vector 为 `(0,0,$proj_initZ)`。
+- 新增“薄膜电容+模拟SCR”拓扑：每级为独立的 C-Winding-DIODE-SW_V4 回路，全部使用 VPULSE，且 `Pw=1e9mm`。
+- 新拓扑各级之间无直接连线，不创建 Boost 专用的线圈串联电阻、VPULSE 并联电阻、电容 ESR 和末级返回电阻。
+- 版本由 0.16.1 升级为 0.17.0。
+
+v0.16.1
+=======
+修改
+----
+- Optimetrics 的默认优化目标由 Maximize `Moving1.Force_z` 改为 Maximize `Moving1.Speed`。
+- 恢复可双击、禁用 Python/pytest 缓存的 `run_tests.cmd`；GUI 默认值测试改为读取 `default.ini`，不覆盖或写死用户配置。
+- 版本由 0.16.0 升级为 0.16.1。
+
+v0.16.0
+=======
+新增/修改
+---------
+- Optimetrics 的 u_n 范围按 POSon 模式分开：磁阻 -0.2～1.2，感应 -0.3～1.6。
+- 两种模式均固定 $POSon_1=-1000mm，不创建也不优化 $u_1。
+- 第一级位置控制源改为经 Pin Survey 确认的 Sources/VPWL，Type=POS，使用 T1/V1～T4/V4 四个分段点。
+- 第二级起 VPULSE 高电平改为 1.25*$V；SW_VModel 的 Von/Voff 改为 0.9*$V / 0.1*$V。
+- 储能电容共用初始电压项目变量默认名改为 $V。VPWL 下降位置增量与末端位置由 default.ini 配置。
+- 版本由 0.15.2 升级为 0.16.0。
+
+v0.15.2
+=======
+修改
+----
+- 程序运行时禁用字节码缓存；新增无参数 run_tests.cmd，并禁用 pytest 缓存，不再生成 __pycache__ 或 .pytest_cache。
+- 根目录新增中英文 README.md，集中说明按钮操作、建模顺序、POSon 公式、几何含义和电路生成流程。
+- GUI 移除长篇描述文字，仅保留控件名称、状态和必要操作反馈。
+- accelerator_builder.ini 更名为 default.ini；全部 GUI 输入初值与路径状态统一由该文件控制。
+- builder_config.py 的配置解析逻辑已合并到 maxwell_accelerator_builder.pyw。
+- 首次启动的 AEDT 工程路径使用程序目录；关闭时保存最后路径；选择已有工程时不再确认覆盖。
+- 程序生成的错误日志统一写入 logs 文件夹。
+- 奇偶Boost的奇数链、偶数链末级返回电阻改接到各自末级自身的电容正极，与单路Boost末级的同节点接法一致。
+- 移除接回级号减 2 电容的规则；奇偶Boost最少级数由 4 改为 2。
+
+v0.15.1
+=======
+修改
+----
+- 奇偶Boost不再只处理总末级：奇数链和偶数链各创建一个值为 $Rlast 的末级返回电阻。
+- 最后偶数级接回 2n-2 级电容正极，最后奇数级接回 2n-3 级电容正极；奇偶Boost最少级数改为 4。
+
+v0.15.0
+=======
+新增
+----
+- Circuit 生成器新增“奇偶Boost”拓扑，同时保留“单路Boost”。
+- 奇偶Boost 使用 DIODE_i.n2 -> C_storage_(i+2).正极，将奇数级和偶数级拆成两条独立级联链。
+- 奇数级与偶数级分别采用上下两排布局，避免跨级连线穿过中间级元件。
+
+v0.14.2
+=======
+修改
+----
+- 单路 Boost 最后一级 DIODE 阴极不再悬空；新增 R_last，并经该电阻接回最后一级 Winding 左端。
+- R_last 引用项目全局变量 $Rlast；变量前缀和缺失时初值统一由 accelerator_builder.ini 设置。
+
+v0.14.1
+=======
+新增
+----
+- Optimization setup 新增线圈长度、外径、匝数和 gap 优化变量，范围为当前值的 50%–150%。
+- 统一间距模式添加单个 gap；独立间距模式添加所有实际线圈间 gap。内径和填充系数不参与优化。
+
+v0.14.0
+=======
+新增
+----
+- Maxwell 建模器页新增“磁阻/感应”POSon 模式单选按钮。
+- 新增无量纲项目变量 `$u_n`，默认前缀和初值分别由 INI 的 `position_factor=u` 与 `initial_values.position_factor=0.5` 设置。
+修改
+----
+- 磁阻模式：`POSon_1=C1`，第2级起使用 `Fn=C(n-1)+u_n*(Cn-C(n-1))`。
+- 感应模式：所有级使用 `Fn=Cn-Ln/2+u_n*Ln`。
+- Optimization setup 不再优化 POS_devi，改为优化当前模式使用的全部 u，统一纯数字范围 -0.2～1.2。
+
+v0.13.2
+=======
+修复
+----
+- Optimetrics setup 不再把 Optimizer 改为 Screening，保留 AEDT 默认值。
+- 所有优化变量、起始值及纯数字 Min/Max 先完整写入 setup 属性，最后只调用一次 EditSetup，避免空 Variables setup 被 AEDT 拒绝。
+- GUI 按钮改名为“添加 Optimization Setup”，完成信息明确显示 Optimizer 保留默认值。
+
+v0.13.1
+=======
+修复
+----
+- “添加 Screening & Optimization”现在会先写入所需项目变量：创建/更新 coil_center 和 POSon，补齐缺失的 POS_devi、POSdur、C，然后才创建 Optimetrics setup。
+- 已存在的 POS_devi、POSdur 和 C 数值保持不变，避免覆盖用户设置；旧工程无需重新运行完整 Maxwell/Circuit 建模即可补齐变量。
+
+v0.13.0
+=======
+新增
+----
+- 每级新增参数化 `$coil_center_n`；第2级起新增 `$POS_devi_n`，并让 `$POSon_n` 引用几何中心与偏移。
+- Maxwell 建模器新增“添加 Screening & Optimization”按钮；目标为 Maximize `Moving1.Force_z`，变量范围以求值后的硬编码数字写入 Optimetrics setup。
+- 函数库新增 `create_accelerator_screening_optimization()`，使用 PyAEDT 官方 OptimizationSetups/SetupOpti API。
+修改
+----
+- Circuit 页删除内部标签页层级；工程、外部电路与单路Boost拓扑改为单层布局。
+- SW_V4、VPULSE 与位置变量回退参数只从 `accelerator_builder.ini` 读取，不再显示 GUI 编辑项。
+
+v0.12.0
+=======
+新增
+----
+- 新增统一入口 maxwell_accelerator_builder.pyw，将 Maxwell2D 建模器和 External Circuit 生成器合并到同一窗口，并共享工程与 Design 配置。
+- 新增 accelerator_builder.ini，集中保存几何/电路变量前缀、缺失变量初值、SW_V4、VPULSE、DIODE 和 VPULSE 并联电阻参数。
+
+修改
+----
+- 删除 GUI 的“全局变量前缀”标签页，变量前缀改为只从 INI 读取。
+- 将电路“拓扑”与“工程 / 外部电路”标签页合并，拓扑下拉框移动到合并页。
+
+删除
+----
+- 删除“基础开关”拓扑及其底层生成分支；电路生成器目前只支持单路Boost。
+- 删除独立的 linear_accelerator_builder_fixed.pyw 和 maxwell_circuit_builder.pyw 入口。
+
+v0.11.1
+=======
+修复
+----
+- 修复“同步 Parameter Values”按钮把 `.sph` 中出现的所有 `$...` token 都提交给 `edit_external_circuit(parameters=...)` 的问题；这会错误包含 `$coil_R_n` 等 dependent project variables，并触发 “Cannot assign a value ... dependent variable” 错误。
+- 同步逻辑现在取“`.sph` 中 Maxwell Circuit 实际引用的项目变量”与 PyAEDT `VariableManager.independent_project_variable_names` 的交集，只把独立项目全局变量按 `{"$Var": "$Var"}` 写入 Parameter Values。
+
+修改
+----
+- GUI 按钮文字改为“同步 Circuit 全局变量 → Parameter Values”，进度信息明确显示正在筛选 Circuit 实际使用的独立项目全局变量。
+- 新增 `get_independent_project_variable_names()`，严格使用 PyAEDT 官方 VariableManager API；若 API 不可用则直接报错，不回退到“全部项目变量”或“全部 netlist token”。
+- GUI 标题、项目版本、README 与 Circuit README 更新为 v0.11.1。
+
+删除
+----
+- 删除把 dependent project variables（例如 `$coil_R_n`）提交给 External Circuit Parameter Values 的行为。
+- 删除同步阶段在无法确认独立性时仍继续使用全部 `$...` 引用的可能性。
+
+v0.11.0
+=======
+新增
+----
+- GUI 新增“同步 Parameter Values = 全局变量名”按钮。点击后读取当前工程/ Circuit Design 对应的已导出 `.sph`，提取其中实际引用的全部 `$...` 项目全局变量，并把每个 External Circuit Parameter 的 Value 写为同名全局变量。
+- 新增 `project_variables_referenced_by_netlist()`：只按 `.sph` 中真实 `$变量名` token 建立参数列表，不使用加速器变量名白名单或语义猜测。
+- 新增 `mirror_external_circuit_project_variables()`：调用官方 PyAEDT `Maxwell2d.edit_external_circuit(netlist_file_path="", schematic_design_name=..., parameters={name: name, ...})` 更新 Edit External Circuit → Parameter Values。
+
+修改
+----
+- `SW_VModel` 创建后显式设置 `DeviceName` 为 GUI/Options 的共享开关模型名；SW_V4 的 `MOD` 与 `.MODEL @DeviceName` 现在一致。
+- `DIODE_Model` 创建后显式设置 `DeviceName` 为 GUI/Options 的共享二极管模型名；DIODE 的 `MOD` 与 `.MODEL @DeviceName` 现在一致。
+- GUI 标题、项目版本、README、Circuit README 与测试更新为 v0.11.0。
+
+删除
+----
+- 删除共享模型数据元件继续保留 AEDT 库默认 `DeviceName=ModelName` 的行为。
+- Parameter Values 同步不做名称回退、数值替换或变量语义推断；`.sph` 中没有出现的项目变量不会被凭空加入。
+
+v0.10.0
+========
+新增
+----
+- 单路Boost每级储能电容容量改为独立项目全局变量：第 n 级 `C_storage_n.C=$C_n`。缺失 `$C_n` 时按 GUI/Options 的 `fallback_capacitance` 创建，默认 `1000uF`；已有 `$C_n` 不覆盖。
+- 新增统一储能电容初始电压项目全局变量 `$Vinit`：所有 `C_storage_n.IC=$Vinit`。缺失时按 `fallback_initial_voltage` 创建，默认 `0V`；已有 `$Vinit` 不覆盖。
+- 新增 `ensure_storage_capacitor_variables_for_indices()`，一次批量创建缺失的 `$C_n` 与 `$Vinit`。
+
+修改
+----
+- GUI 将“每级储能电容 C”改为“缺失 `$C_n` 时初值”，并新增“缺失 `$Vinit` 时初值”。
+- 储能电容仍严格使用实机确认的固定 native pin `n1/n2`，仍只 Rotate 一次；ESR、VPULSE、SW_V4 及其接线/旋转规则均不变。
+- 版本号、GUI 标题、README、Circuit README 与测试更新为 v0.10.0。
+
+删除
+----
+- 删除把所有级储能电容容量直接写成同一个常量 `storage_capacitance` 的生成方式；不再由 GUI 直接把同一个 C 数值写入所有电容。
+
+v0.9.1
+=======
+
+修复
+- 修复 v0.9.0 `CircuitBuilderGUI.__init__()` 漏建 `self.storage_capacitance` 与 `self.fallback_esr` 的问题；GUI 现在在 `_build_ui()` 前分别创建默认值 `1000uF` 与 `1mOhm` 的 `tk.StringVar`，不再启动即触发 `AttributeError`。
+- 新增 GUI 初始化回归测试：在不启动真实 Tk/AEDT 的情况下实例化 `CircuitBuilderGUI`，确认所有 `_build_ui()` 所需变量已经预先存在且默认值正确。
+
+修改
+- GUI 标题、项目版本及当前 README/Circuit README 标记更新为 v0.9.1。
+
+删除
+- 无。单路Boost拓扑、储能电容/ESR接线、固定 native pin 映射、VPULSE/电阻/电容旋转规则均保持 v0.9.0 不变。
+
+v0.9.0
+=======
+
+新增
+- 单路Boost每级新增一个储能电容 `C_storage_n` 和一个串联 ESR 电阻 `R_ESR_n`。
+- 新增每级项目全局变量 `$ESR_n`；缺失时按 GUI/Options 的 `fallback_esr` 创建，默认 `1mOhm`，已有变量保持不变。
+- 新增 GUI 参数“每级储能电容 C”（默认 `1000uF`）和“缺失 $ESR_n 时初值”（默认 `1mOhm`）。
+- `AcceleratorCircuitResult` 新增 `storage_capacitors`、`storage_esr_resistors`；完成对话框显示两类元件数量。
+- 新增 `create_storage_capacitor()`、`create_storage_esr_resistor()`、`connect_storage_capacitor_branch()`、`ensure_esr_variables_for_indices()`。
+
+修改
+- 储能支路固定连接为 `Winding_n.n1 -> C_storage_n.n2 ->(经电容) C_storage_n.n1 -> R_ESR_n.n2 -> R_ESR_n.n1 -> GND`。
+- 对 n>1，`Winding_n.n1` 与既有 `DIODE_(n-1).n2` 级联节点自动为同一网络；第1级直接使用 `Winding_1.n1`。
+- `C_storage_n` 与 `R_ESR_n` 都从 0° 放置后执行恰好 1 次 +90° 逆时针 Rotate；依据实机 survey，旋转后 n2 在上、n1 在下。
+- 单路Boost每级 Ground 数由3个增为4个，新 Ground 专用于储能电容 ESR 支路。
+- 版本号、GUI、README、Circuit README 与测试更新为 v0.9.0。
+
+删除
+- 无。仍不引入任何引脚语义猜测、坐标推断、候选名回退或自动极性交换。
+
+v0.8.0
+======
+新增
+- 根据 2026-08-08 实机 Maxwell Circuit Component/Pin Survey，将 Winding、Res、DIODE、VPULSE、SW_V4 的 native pin 映射全部固化为 AEDT 实测名称。
+- 新增 `rotate_ccw_once()`；专用于 VPULSE 的固定 10 kΩ 并联电阻。
+- 将独立诊断工具 `maxwell_circuit_component_pin_survey.pyw` 纳入完整项目包，便于以后重新扫描 AEDT 元件库。
+
+修改
+- VPULSE 不再旋转，固定以库默认 0° 竖直放置；实测 n1=正端（上），n2=负端（下）。
+- `R_VPULSE_n` 先按 0° 放置，再执行一次 +90° 逆时针 Rotate，使其竖直；旋转后 n2 在上、n1 在下，并与 VPULSE 上/下端分别直接并联。
+- 修正 v0.7.x 尚未更新的普通元件旧 pin 名：Winding N1/N2 -> n1/n2；Res 1/2 -> n1/n2；DIODE A/K -> n1/n2。
+- 单路 Boost 主开关节点改接 SW_V4.n1（270° 后上端），SW_V4.n2（下端）接地，以匹配固定姿态并缩短导线。
+- 单路 Boost 固定接线更新为：Winding.n2 -> R_coil.n1；R_coil.n2 -> DIODE.n1 与 SW.n1；SW.n2 -> GND；DIODE.n2 -> 下一 Winding.n1。
+- 10 kΩ 并联电阻移到 VPULSE 侧方、与 VPULSE 同中心高度，减少跨越导线。
+- GUI、README、Circuit README 和测试版本号更新为 v0.8.0。
+
+删除
+- 删除生成器中 VPULSE `angle=-90` 的水平放置方式；VPULSE 不再执行任何旋转。
+- 删除 v0.7.1 在 `GetComponentPinLocation()` 失败后再次调用 `GetComponentPins()` 的诊断性引脚枚举；固定 pin 名失败时直接报错。
+- 不恢复任何引脚语义推断、候选名称回退、自动交换、WireId 保险或导出网表二次验证。
+
+v0.7.1
+======
+新增
+- GetComponentPinLocation 报错时附带 AEDT 当前 GetComponentPins() 返回值，仅用于诊断；不进行任何引脚重映射、回退或自动纠错。
+
+修改
+- 修正 v0.7.0 对 Maxwell Circuit VPULSE native pin 名的错误假设。符号上的 “+ / -” 是极性标记，不是 Schematic Editor native pin 名；生成器固定改用 VPULSE n1/n2。
+- 固定 VPULSE 映射为 n1=positive、n2=negative；控制回路为 VPULSE.n1 -> SW_V4.n3，VPULSE.n2 -> GND，SW_V4.n4 -> GND。
+- 10 kΩ 并联电阻固定跨接 VPULSE.n1/n2。
+- SW_V4 映射保持 v0.7.0 已确认的 n1=main_1、n2=main_2、n3=control_plus、n4=control_minus；不恢复任何坐标语义推断。
+- GUI、README、Circuit README 和测试版本号更新为 v0.7.1。
+
+删除
+- 无。v0.7.0 删除的语义推断、候选名回退、几何校验、WireId 保险和导出网表二次验证仍保持删除状态。
+
+v0.7.0
+------
+新增
+- 将用户“四个引脚分别连接不同网络并导出 .sph”的实验结果固化为 SW_V4 唯一映射：n1=main_1、n2=main_2、n3=control_plus、n4=control_minus。
+- 为生成器使用的普通元件增加固定 native pin 常量：Winding N1/N2、Res 1/2、DIODE A/K、VPULSE N-/N+、SW_V4 n1/n2/n3/n4。
+- 固定映射常量通过 maxwell_circuit_toolkit 公共 API 导出，便于外部脚本直接复用。
+
+修改
+- 单路Boost控制回路改为固定连接：VPULSE.N+ -> SW_V4.n3（control+）；SW_V4.n4（control-）-> GND；VPULSE.N- -> GND。
+- 主回路固定连接：Winding.N2 -> R_coil.1；R_coil.2 -> DIODE.A 与 SW_V4.n2；SW_V4.n1 -> GND。
+- DIODE.K -> 下一 Winding.N1；VPULSE 10 kΩ 并联电阻固定使用 Res.1/Res.2 跨 N-/N+。
+- SW_V4 仍严格执行三次 +90° 逆时针 Rotate、不 FlipHorizontal；Rotate 从此仅负责视觉方向，不参与任何电气 pin 判断。
+- 保留 v0.6.9 的紧凑布局和 native GetComponentPinLocation -> schematic_units 坐标转换，仅用于将固定 pin 名画到其当前坐标。
+- GUI 标题、README、Maxwell Circuit README 和测试同步更新为 v0.7.0。
+
+删除
+- 删除 _switch_semantic_pins()：不再支持 N1/N2/NC1/NC2 候选名、不再根据 n1~n4 顺序或坐标推断 SW_V4 功能。
+- 删除 _vpulse_polarity_pins()：不再根据名称候选或左右位置推断 VPULSE 极性。
+- 删除 _left_right_pin_names() 与 _component_pin_names_by_x()：不再根据几何坐标推断两端元件左右/功能端。
+- 删除 _require_same_net()、get_component_pin_wire_id()、VPULSE WireId 防短检查等接线后保险机制。
+- 删除 validate_single_boost_netlist()、export_and_assign_external_circuit() 的 validator 回调和 AcceleratorCircuitOptions.validate_exported_netlist；生成后不再用假定的网表语义做二次自动纠错/拒绝回写。
+- 删除 get_component_pin_names() 对 GPort 的 synthetic-pin 回退；Ground 直接使用 PyAEDT component.pins[0] 的唯一 synthetic 接线点。
+
+v0.6.9
+------
+修复
+- 根据用户实机导出的 `.sph`，确认 v0.6.8 的严重短路不是 SW_V4 模型参数问题，而是绘线端点与路由问题：导出出现 `S... 0 0 0 0`、`V... 0 0`、`R_coil... ... 0` 和 `R_VPULSE... 0 0`，说明主回路、控制回路及 VPULSE 并联支路都被错误并入地网。
+- 修复旋转元件接线时混用两种坐标系的问题。Schematic Editor `GetComponentPinLocation()` 返回米，而 PyAEDT `create_wire()` 的 points 使用当前 `schematic_units`；新增 `_native_pin_xy_in_schematic_units()`，先读取原生变换后 pin 坐标，再显式转换为当前 schematic unit 后绘线。
+- 普通 CompInst 的导线端点不再使用可能在 Rotate 后失配的 `CircuitPins.location`；改为原生 `GetComponentPinLocation()`。GPort/Ground 仍保留 PyAEDT synthetic pin 逻辑。
+- 修复 SW_V4 两组竖直端子的穿越短路：Boost 开关节点到 N2 改为从侧面水平进入（Y-first），不再沿 N1/N2 同一 X 列下行。
+- SW_V4 的 N1 Ground 和 NC1 Ground 分别向右/左小幅偏移后再接地，强制形成 dog-leg，避免接地导线穿过 N2/NC2 并形成 junction。
+- `.sph` 验证新增主回路检查：必须满足 `S... 0 <switching_node> 0 <control_plus> ...`；N1/N2 或 NC1/NC2 任何一对出现 `0 0` 都直接拒绝回写 External Circuit。
+- `.sph` 验证新增主开关节点与控制正节点不得相同的检查。
+
+修改
+- 在保持元件相对布局的基础上进一步压缩单路Boost：stage pitch 3000 -> 2400，并同步缩短 Winding、R_coil、SW_V4、VPULSE、DIODE、Ground 与模型元件间距。
+- 保留每个 VPULSE 并联固定 `10000ohm` 电阻。
+- GUI/README/测试/包版本更新到 v0.6.9。
+
+删除
+- 无。
+
+v0.6.8
+------
+新增
+- 每个 VPULSE_n 自动并联一个固定 10 kΩ 电阻 `R_VPULSE_n`，阻值写死为 `10000ohm`，不创建项目变量。
+- Maxwell Circuit API 新增 `create_resistor()`、`create_vpulse_shunt_resistor()` 和 `connect_resistor_across_vpulse()`。
+- `AcceleratorCircuitResult` 新增 `pulse_shunt_resistors`，GUI 完成信息单独显示 VPULSE 并联电阻数量。
+- 单路Boost导出 `.sph` 验证新增 VPULSE 并联支路检查：必须存在一个电阻跨接 VPULSE N+/N- 两节点。
+
+修复
+- 修复 v0.6.7 将 generic `n1/n2/n3/n4` 按旋转后屏幕坐标重新映射的错误。实机导出 `SS633 net_8 0 net_9 0` 证明该映射把主回路和控制回路两对端子都反接。
+- generic SW_V4 现按原生终端编号固定解释为 `n1=N1, n2=N2, n3=NC1, n4=NC2`；三次逆时针 Rotate 仅改变视觉方向，不改变电气身份。
+- 恢复正确目标网表：`S... 0 <switch_node> 0 <control_plus> ...`，即 N1/NC1 接地，N2 接Boost开关节点，NC2接VPULSE正端。
+- 几何检查不再用 Y 坐标推断端子正负，仅检查主端和控制端各自形成竖直端子对，避免坐标系方向造成误判。
+
+修改
+- `单路Boost` 与 `基础开关` 两种拓扑都为每个 VPULSE 添加固定 10 kΩ 并联电阻。
+- GUI/README/测试/包版本更新到 v0.6.8。
+
+删除
+- 删除 v0.6.7 的“右上=N2、右下=N1、左上=NC2、左下=NC1”坐标语义映射。
+
+v0.6.7
+- 修复 SW_V4 的关键 native-pin 映射错误：实机三次逆时针旋转后，n1/n2/n3/n4 的编号不能直接解释为 N1/N2/NC1/NC2。
+- 对 generic n1/n2/n3/n4 改为按旋转后的真实坐标识别语义：右上=N2（开关节点）、右下=N1（主回路地）、左上=NC2（控制+）、左下=NC1（控制-）。
+- 因而用户实测坐标 n1=右上、n2=右下、n3=左上、n4=左下 时，正确映射为 n1->N2、n2->N1、n3->NC2、n4->NC1。
+- 保留 SW_V4 放置后连续 3 次 +90° 逆时针 Rotate、不 FlipHorizontal 的实机确认操作。
+- 更新几何检查和测试夹具，避免再次把 generic pin 编号误当作电气语义。
+- 电气目标保持不变：N2 接 Boost 开关节点，N1 接地，NC2 接 VPULSE+，NC1 接地。
+
+Maxwell2D / Maxwell Circuit Accelerator Toolkit 更新记录
+==========================================================
+
+v0.6.6
+------
+新增
+- 新增 `rotate_ccw_three_times()`：SW_V4 放置后严格连续执行3次 +90° 逆时针 Rotate，不执行 FlipHorizontal，与用户在实机 GUI 中确认的正确姿态一致。
+- SW_V4 变换后增加更严格的几何校验：N2 必须位于 N1 上方，控制端必须位于主端左侧，且 NC2(control+) 必须位于 NC1(control reference/-) 上方。
+- 控制正端导线改用 Y-first 正交路由，使竖直段位于 VPULSE 一侧，避免在 SW_V4 控制端列上穿过另一端子。
+
+修改
+- 根据已验证的正确参考 `.sph`（`S... 0 <switch_node> 0 <control_plus> ...`）修正 SW_V4 控制端语义：NC1/n3 为控制参考/负端并接地，NC2/n4 为控制正端并连接 VPULSE 正极。
+- 单路Boost目标网表改为 `V... <control_plus> 0 ...` 与 `S... 0 <switch_node> 0 <control_plus> ...`；导出验证器按该关系检查。
+- 单路Boost布局继续压缩：stage pitch 4000 -> 3000，并同步缩短 Winding、R_coil、SW_V4、VPULSE、DIODE 和 Ground 的局部间距。
+- GUI/README/测试同步更新到 v0.6.6。
+
+修复
+- 修复 v0.6.5 错把 NC1 当控制正端、NC2 当控制负端的错误；该错误与用户最早提供的正确 `1.sph` 不一致。
+- 修复 v0.6.5 的 SW_V4 `Rotate(+90)+FlipHorizontal` 姿态；该姿态会导致控制端接线与用户实机符号方向不一致。
+- 修复控制正端 Manhattan 路由可能沿开关端子列竖直穿过另一控制端的问题。
+
+删除
+- 单路Boost建模流程不再使用 FlipHorizontal。旧 `rotate_ccw_and_flip_horizontal()` API 仅为兼容既有外部脚本保留，不再用于新拓扑。
+
+v0.6.5
+------
+新增
+- 单路Boost导出网表验证增加严格的 VPULSE / SW_V4 控制极性检查：VPULSE N+ 必须连接 SW_V4 NC1（控制+），VPULSE N- 与 SW_V4 NC2（控制-）必须分别接地。
+- 新增精确变量 token 匹配测试，防止 `$POSon_1` 误匹配 `$POSon_10`～`$POSon_19`。
+- 新增 20 级网表验证回归测试。
+
+修改
+- 根据用户实机符号与 A4 `.sph` 修正 VPULSE 朝向：实机 +90° 会得到左(+)右(-)，因此改为 -90°，恢复参考图所需的左(-)右(+)。
+- 修正 SW_V4 控制端连接语义：NC1 为控制正端，NC2 为控制负端；连接改为 VPULSE(+)→NC1，VPULSE(-)→独立GND，NC2→独立GND。
+- 保留每级 `R_coil_n=$coil_R_n` 串联于 Winding_n 右端与 Boost 开关节点之间。
+- 单路Boost布局整体压缩：级间距由 6000 降至 4000，Winding/电阻/开关/VPULSE/二极管及Ground之间的局部距离同步缩短，保持原相对布局。
+- Maxwell Circuit 建模器默认工程路径固定为 `E:/Ansys/Maxwell/LinearAcceleratorGenerator/LinearAccelerator_20260807_205932.aedt`。
+- GUI 标题版本更新为 v0.6.5。
+
+修复
+- 修复 v0.6.4 导出 `.sph` 中 `V... 0 net_ctrl` 与 `S... 0 net_sw 0 net_ctrl` 所表示的 VPULSE 和控制端整体反极性。
+- 修复 v0.6.4 网表验证器用子串查找 `$POSon_n`，导致第1级被 10～19级共计 11 条 VPULSE 误命中的错误。
+
+删除
+- 删除“固定 +90° 即可得到正确 VPULSE 极性”的错误假设；实机改用 -90°。
+- 删除验证器中“NC1 必须接地、NC2 必须为控制正节点”的错误极性规则。
+
+Maxwell2D Accelerator Toolkit - 更新记录
+=====================================
+
+v0.6.4
+------
+新增：
+- 单路Boost每级新增串联线圈电阻 `R_coil_n`，其阻值直接引用项目全局变量 `$coil_R_n`；编号与 Winding_n 严格对应。
+- 新增 `create_coil_series_resistor()` 可复用 API。
+- 新增 VPULSE 极性/方向检查：单路Boost中 VPULSE 必须水平放置，负端在左、正端在右。
+- 新增源短路保护：接线后检查 VPULSE 正负端不得落在同一 native WireId。
+- 新增导出 `.sph` 的单路Boost电气检查：在回写 Edit External Circuit 前拒绝 `V... 0 0`、SW_V4 控制正端接地、VPULSE 非地节点未接到 SW_V4 控制正端、以及电阻数量不足等错误。
+- 新增回归测试，模拟“竖直 VPULSE 的接地导线穿过另一端子后形成短路”的真实 AEDT 行为。
+
+修改：
+- 修复 v0.6.3 中 VPULSE 以 angle=0 竖直放置的问题。现在在单路Boost和基础开关拓扑中均以 +90° 放置；在用户当前 AEDT 元件库中这与手工参考图一致：负极左、正极右。
+- 单路Boost主回路改为 `Winding_n -> R_coil_n -> switching node`；switching node 再连接 DIODE_n 阳极与 SW_n.N2。DIODE_n 阴极仍直接接 Winding_(n+1) 左端。
+- VPULSE 接线明确为：VPULSE(-) 独立接地；SW_n.NC1 独立接地；VPULSE(+) 仅连接 SW_n.NC2。
+- 扩大单路Boost级间横向间距，为 Winding、R_coil、DIODE 和 SW 提供独立布局空间。
+- 更新 Maxwell Circuit GUI 完成信息，显示线圈串联电阻数量。
+- 更新 README、Maxwell Circuit README 和版本号。
+
+删除：
+- 删除“VPULSE angle=0 时可以按左右端识别正负极”的错误假设。
+- 删除单路Boost中 `Winding_n` 右端直接作为开关节点的连接；现在通过 `R_coil_n` 串联后再进入开关节点。
+
+v0.6.3
+------
+新增：
+- 增加 Schematic Port/GPort synthetic-pin 兼容路径：当 oEditor.GetComponentPins() 对 GPort/PagePort/IPort 返回空数组时，转而使用 PyAEDT CircuitComponent.pins 提供的单个 synthetic CircuitPins。
+- 新增真实 GPort 行为回归测试：模拟 GetComponentPins(GPort)==[]，同时 synthetic pin 保持可用于 create_wire 接线。
+
+修改：
+- 修复 v0.6.2 将 Ground(GPort) 当作普通 CompInst 并要求其暴露 native schematic pin，导致 “Component 'GPort@... exposes no schematic pins'” 后中止的问题。
+- Ground 接线仍使用 create_wire，但终点坐标现在来自 PyAEDT synthetic GPort pin.location；这与 PyAEDT 0.25 官方 CircuitComponent.pins/CircuitPins.location 的 Ground 特殊处理一致。
+- 更新 Maxwell Circuit README、主 README 和版本号。
+
+删除：
+- 删除“所有 schematic 对象都必须由 GetComponentPins() 返回至少一个 native pin”的错误假设。
+
+v0.6.2
+------
+新增：
+- SW_V4 原生 pin 名兼容层：除 N1/N2/NC1/NC2 外，支持 AEDT 实机 GetComponentPins 返回的 n1/n2/n3/n4。
+- 对 n1/n2/n3/n4 按 SW_V4 四端口终端顺序映射：n1->N1、n2->N2、n3->NC1、n4->NC2；映射依据原生 pin 名的数字后缀，不依赖 GetComponentPins 返回数组的位置。
+- SW_V4 映射后增加实际坐标方向校验：Rotate(+90° CCW)+FlipHorizontal 后必须满足 N2 位于 N1 上方，否则在画线前终止并报告每个原生 pin 的坐标。
+
+修改：
+- 修复 v0.6.1 在部分 AEDT/Maxwell Circuit 元件库中遇到 ['n1','n2','n3','n4'] 时直接拒绝建模的问题。
+- 单元测试的 SW_V4 假对象改为使用实机观测到的 n1/n2/n3/n4 命名，以覆盖真实兼容路径。
+- 更新 Maxwell Circuit README、主 README 和版本号。
+
+删除：
+- 删除“只接受语义端口名 N1/N2/NC1/NC2”的限制。
+
+v0.6.1
+------
+新增：
+- maxwell_circuit_toolkit 新增 Schematic Editor 辅助接口：get_component_pin_names、get_component_pin_location、get_component_pin_wire_id、wire_component_pins、rotate_ccw_and_flip_horizontal。
+- 单路Boost每级改为三个独立 Ground 符号：VPULSE 负端、SW_V4 控制负端 NC1、SW_V4 主回路 N1 分别接地。
+- 连线后使用 GetComponentPinInfo/WireId 严格校验开关节点、控制正端节点及级联节点；任一端点 WireId 为空或不一致立即终止，避免导出错误 .sph。
+
+修改：
+- 根据用户提供的正确/错误 .sph 重新书写单路Boost连线代码；不再使用 CircuitComponent.pins[index] 作为 SW_V4 端口语义。
+- SW_V4 现在严格按原生端口名 N1/N2/NC1/NC2 连接：N1=主回路地，N2=开关节点，NC1=控制地，NC2=VPULSE 正端。
+- SW_V4 放置后严格执行一次 Schematic Editor Rotate（+90°逆时针），再执行一次 FlipHorizontal，与手工参考操作一致。
+- Winding、DIODE、VPULSE 的左右端改用 GetComponentPinLocation 实际坐标判断；连线改为按明确 pin name 取得真实端点坐标，再通过 PyAEDT create_wire（底层 oEditor.CreateWire）显式绘制折线，不再依赖端子列表顺序。
+- 更新 README、Maxwell Circuit 建模器说明及自动测试。
+
+删除：
+- 删除单路Boost内部基于 PyAEDT CircuitPin.connect_to_component 和固定 pins[index] 的接线路径。
+
+v0.6.0
+------
+新增：
+- Maxwell Circuit 建模器新增“拓扑”下拉框；当前提供“单路Boost”和“基础开关（Winding + SW_V4 + VPULSE）”。
+- 新增单路Boost拓扑生成器。每级自动创建一个 DIODE_n；全部二极管共用一个 DIODE_Model_Common。
+- 单路Boost每级自动创建两个 Ground：SW_V4 主回路下端接地；VPULSE 负端与 SW_V4 控制负端共地。
+- 单路Boost级联规则：DIODE_n 阴极接 Winding_(n+1) 左端；最后一级二极管阴极保持开放，作为后续输出节点。
+- maxwell_circuit_toolkit 新增 create_diode_model、create_diode、create_ground、connect_single_boost_stage、connect_boost_cascade、拓扑注册/查询接口。
+- AcceleratorCircuitResult 新增 topology、diodes、grounds、diode_model 字段。
+- GUI 新增共享二极管模型名称设置，默认 DIODE_Model_Common。
+- 从本版本起，完整 ZIP 始终包含本 CHANGELOG.txt，并在每个新版本记录新增/修改/删除内容。
+
+修改：
+- 根据 Maxwell Circuit .sph 端子顺序修正 SW_V4 主回路连接：Winding 右端应连接 SW_V4 main-high/top（第二主端子）。
+- 单路Boost按参考图调整布局：Winding/DIODE 位于上方水平链路，SW_V4 位于开关节点下方，VPULSE 位于开关左下方，Ground 位于更下方。
+- Maxwell Circuit 构建入口改为按 topology 分派，后续可继续增加其他拓扑而无需改变 GUI 工作流。
+- 单路Boost要求 Winding 编号必须从 1 开始连续，以避免级联误接。
+- 更新 Maxwell Circuit 示例、README 和测试。
+
+删除：
+- 无。
+
+v0.5.0
+------
+新增：
+- 新增 maxwell_circuit_toolkit Maxwell 外部电路函数库。
+- 新增 maxwell_circuit_builder.pyw。
+- 使用 Maxwell2d.create_external_circuit() 自动插入全部 External Winding。
+- 每个 Winding 生成一个 SW_V4 和一个位置控制 VPULSE；所有开关共用 SW_VModel。
+- VPULSE：Type=POS，V1=0V，V2=400V，Tr=Tf=0，Td=$POSon_n，Pw=$POSdur_n。
+- 缺失的 $POSon_n / $POSdur_n 批量创建，不覆盖已有变量。
+- 自动导出 .sph 并通过 edit_external_circuit() 回写 Maxwell。
+
+修改：
+- 无。
+
+删除：
+- 无。
+
+v0.4.0
+------
+新增：
+- 新增基于 AEDT ChangeProperty 的批量 Local/Project Variable 注册接口。
+
+修改：
+- 变量新增使用 NewProps/VariableProp，已有变量修改使用 ChangedProps。
+- 建模器改为一次批量注册全部项目全局变量，避免逐变量全表验证带来的近 O(n^2) 开销。
+- 默认 AEDT 工程目录改为 E:\\Ansys\\Maxwell。
+
+删除：
+- 删除逐变量 VariableManager 全表校验路径。
+
+v0.3.1
+------
+新增：
+- GUI 增加建模进度条和阶段状态提示。
+- 工作线程异常写入错误日志。
+
+修改：
+- AEDT 启动/建模/保存/释放移入工作线程，避免 Tkinter 界面冻结。
+
+删除：
+- 无。
+
+v0.3.0
+------
+新增：
+- GUI 增加非图形化模式。
+- 图形模式完成后仅释放 PyAEDT 控制；非图形模式完成后关闭后台 AEDT。
+
+修改：
+- 默认变量前缀改为 coil_inner_Diameter、coil_outer_Diameter、coil_Len、Turn、coil_R；其他前缀保持原值。
+
+删除：
+- 无。
+
+v0.2.0
+------
+新增：
+- GUI 增加“全局变量前缀”标签页。
+- 增加变量前缀合法性和重复检查。
+
+修改：
+- 电阻率单位改为 AEDT 原生 Ohmm。
+- 取消默认 PyAEDT 包版本强制校验。
+
+删除：
+- 无。

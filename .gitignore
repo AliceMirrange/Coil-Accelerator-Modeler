@@ -1,0 +1,28 @@
+# Python caches and test artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Packaging artifacts
+build/
+dist/
+*.egg-info/
+
+# Runtime logs and generated AEDT data
+*.log
+*.aedt.lock
+*.aedtresults/
+*.asol
+*.asol_priv
+*.semaphore
+*.tmp
+*.sph
+
+# Generated recording QA output
+article_output/video_demo/
+
+# Temporary Microsoft Office files
+~$*
