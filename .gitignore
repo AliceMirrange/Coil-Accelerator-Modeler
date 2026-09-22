@@ -10,6 +10,7 @@ htmlcov/
 build/
 dist/
 *.egg-info/
+LAG_latest.zip
 
 # Runtime logs and generated AEDT data
 *.log
@@ -22,7 +23,11 @@ dist/
 *.sph
 
 # Generated recording QA output
-article_output/video_demo/
+article_output/
 
 # Temporary Microsoft Office files
 ~$*
+
+# Local-only development files
+tools/temp_tools/
+tests/
